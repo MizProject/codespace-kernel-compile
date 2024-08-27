@@ -53,18 +53,18 @@ function setup_codebase_sys_swap() {
         read -p "Do you want to have a swap in the codespace? (Answer: y/N) Warning: Enabling this will create unencrypted swap in /tmp: " ANS
         case $ANS in
             [Yy]*)
-                read -p "8 or 16GB? (Answer: 8/16)" size
+                read -p "8 or 16GB? (Answer: 8/16): " size
                 case $size in
                     "8")
                         echo "Wait..."
-                        fallocate -l 8G /tmp/swap_unc
+                        dd if=/dev/zero of=/tmp/swap_unc bs=1024 count=8388608 status=progress # falloc is broken on azure i think
                         chmod 600 /tmp/swap_unc
                         swapon /tmp/swap_unc
                         echo "Done"
                         ;;
                     "16")
                         echo "Wait..."
-                        fallocate -l 16G /tmp/swap_unc
+                        dd if=/dev/zero of=/tmp/swap_unc bs=1024 count=16777216 status=progress
                         chmod 600 /tmp/swap_unc
                         swapon /tmp/swap_unc
                         echo "Done"
@@ -73,7 +73,7 @@ function setup_codebase_sys_swap() {
                         echo "$size is invalid"
                         echo "Only allowed: 8 / 16"
                         echo "Fall back to 8G"
-                        fallocate -l 8G /tmp/swap_unc
+                        dd if=/dev/zero of=/tmp/swap_unc bs=1024 count=8388608 status=progress
                         chmod 600 /tmp/swap_unc
                         swapon /tmp/swap_unc
                         echo "Done"
