@@ -50,7 +50,7 @@ function setup_codebase_sys_swap() {
     if [ -e /tmp/swap_unc ]; then
         echo "Swap already created... No need for swap adding"
     else
-        read -p "Do you want to have a swap in the codespace? (Answer: y/N) Warning: Enabling this will create unencrypted swap in /tmp" ANS
+        read -p "Do you want to have a swap in the codespace? (Answer: y/N) Warning: Enabling this will create unencrypted swap in /tmp: " ANS
         case $ANS in
             [Yy]*)
                 read -p "8 or 16GB? (Answer: 8/16)" size
@@ -101,7 +101,7 @@ function setup_storage_space() {
         df -h /tmp/disk_loop
     else
         echo "Size Available: None[0], 24GB [24] and 40GB [40]"
-        read -p "Choose what additional storage size you wanted, you can ignore this if you want... (Warning: The space/disk will be reset after codespace ends itselfm, suggest you should now wha you are doing)" STOR
+        read -p "Choose what additional storage size you wanted, you can ignore this if you want... (Warning: The space/disk will be reset after codespace ends itselfm, suggest you should now wha you are doing): " STOR
         case $STOR in
             "24")
                 echo "Wait..."

@@ -14,7 +14,7 @@ function package_man() {
     echo "Done installing dependencies"
 }
 
-read -p "The script will try to Install Necessary tools for the Android Kernel Compiling sessions, press 'Y' or 'y' for yes and 'N' or 'n' for no..." ANS
+read -p "The script will try to Install Necessary tools for the Android Kernel Compiling sessions, press 'Y' or 'y' for yes and 'N' or 'n' for no...: " ANS
 case $ANS in
     [Yy]*)
         package_man
