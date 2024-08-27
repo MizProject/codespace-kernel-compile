@@ -79,6 +79,7 @@ function setup_codebase_sys_swap() {
                         echo "Done"
                         ;;
                 esac
+                ;;
             [Nn]*)
                 echo "Swap won't be added"
                 ;;
