@@ -59,6 +59,7 @@ function setup_codebase_sys_swap() {
                         echo "Wait..."
                         dd if=/dev/zero of=/tmp/swap_unc bs=1024 count=8388608 status=progress # falloc is broken on azure i think
                         chmod 600 /tmp/swap_unc
+                        mkswap /tmp/swap_unc
                         swapon /tmp/swap_unc
                         echo "Done"
                         ;;
@@ -66,6 +67,7 @@ function setup_codebase_sys_swap() {
                         echo "Wait..."
                         dd if=/dev/zero of=/tmp/swap_unc bs=1024 count=16777216 status=progress
                         chmod 600 /tmp/swap_unc
+                        mkswap /tmp/swap_unc
                         swapon /tmp/swap_unc
                         echo "Done"
                         ;;
@@ -75,6 +77,7 @@ function setup_codebase_sys_swap() {
                         echo "Fall back to 8G"
                         dd if=/dev/zero of=/tmp/swap_unc bs=1024 count=8388608 status=progress
                         chmod 600 /tmp/swap_unc
+                        mkswap /tmp/swap_unc
                         swapon /tmp/swap_unc
                         echo "Done"
                         ;;
