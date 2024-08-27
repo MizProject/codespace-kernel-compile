@@ -1,8 +1,46 @@
 #!/bin/bash
 
+if [ "$1" == --help ] || [ "$1" == "-h" ]; then 
+    echo "post_setup.sh"
+    echo "Script to finalize setup of your codespace, by adding swap or storage (or both)"
+    echo ""
+    echo "Usage:"
+    echo "./post_setup.sh <arg>"
+    echo ""
+    echo "--help -h     Help"
+    echo "--umount -u   Unmount"
+    exit
+fi
+
+
 if [ ! $(/usr/bin/id -u) == 0 ]; then
     echo "You need Root first"
     exit 1
+fi
+
+# Adding removing swap because whynot
+if [ "$1" == "--umount" ] || [ "$1" == "-u" ]; then
+    function umount_rm_sys_swap() {
+        if [ -e /tmp/swap_unc ]; then
+            echo "Found swapfile, unmounting and deleting it"
+            swapoff /tmp/swap_unc
+            rm -rf /tmp/swap_unc
+        else
+            echo "No swapfile found"
+        fi
+    }
+    function umount_rm_storage() {
+        if [ -e /workspaces/diskmnt ] && [ -e /tmp/disk_loop ]; then
+            echo "Found disk, unmounting and deleting it"
+            umount /workspaces/diskmnt
+            rm -rf /tmp/disk_loop
+        else
+            echo "No loop disk found"
+        fi
+    }
+    umount_rm_sys_swap
+    umount_rm_storage
+    exit
 fi
 
 function setup_codebase_sys_swap() {
