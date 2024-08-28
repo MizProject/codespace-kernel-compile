@@ -29,17 +29,17 @@ if [ "$1" == "--umount" ] || [ "$1" == "-u" ]; then
             echo "No swapfile found"
         fi
     }
-    function umount_rm_storage() {
-        if [ -e /workspaces/diskmnt ] && [ -e /tmp/disk_loop ]; then
-            echo "Found disk, unmounting and deleting it"
-            umount /workspaces/diskmnt
-            rm -rf /tmp/disk_loop
-        else
-            echo "No loop disk found"
-        fi
-    }
+    # function umount_rm_storage() {
+    #     if [ -e /workspaces/diskmnt ] && [ -e /tmp/disk_loop ]; then
+    #         echo "Found disk, unmounting and deleting it"
+    #         umount /workspaces/diskmnt
+    #         rm -rf /tmp/disk_loop
+    #     else
+    #         echo "No loop disk found"
+    #     fi
+    # }
     umount_rm_sys_swap
-    umount_rm_storage
+    # umount_rm_storage
     exit
 fi
 
@@ -57,7 +57,7 @@ function setup_codebase_sys_swap() {
                 case $size in
                     "8")
                         echo "Wait..."
-                        dd if=/dev/zero of=/tmp/swap_unc bs=1024 count=8388608 status=progress # falloc is broken on azure i think
+                        dd if=/dev/zero of=/tmp/swap_unc bs=1024 count=8388608 status=progress # fallocate is broken when creating swap
                         chmod 600 /tmp/swap_unc
                         mkswap /tmp/swap_unc
                         swapon /tmp/swap_unc
@@ -94,62 +94,64 @@ function setup_codebase_sys_swap() {
     fi
 }
 
-function setup_storage_space() {
-    # You want expanded storage?? Ill give you expanded storage...
-    # Idk if microsoft would patch this even i guess
-    if [ -e /tmp/disk_loop ] && [ -e /workspaces/diskmnt ]; then
-        echo "No need to setup storage space... its already available"
-        echo "df -h /workspaces/diskmnt"
-        df -h /workspaces/diskmnt
-        echo "df -h /tmp/disk_loop"
-        df -h /tmp/disk_loop
-    else
-        echo "Size Available: None[0], 24GB [24] and 40GB [40]"
-        read -p "Choose what additional storage size you wanted, you can ignore this if you want... (Warning: The space/disk will be reset after codespace ends itselfm, suggest you should now wha you are doing): " STOR
-        case $STOR in
-            "24")
-                echo "Wait..."
-                mkdir -p /workspaces/diskmnt
-                dd if=/dev/zero of=/tmp/disk_loop bs=1024 count=25769803776 status=progress
-                echo "Done creating, now formatting and mounting"
-                echo "Setting up disks"
-                LS="$(losetup -f)"
-                losetup "$LS" /tmp/disk_loop
-                mkfs.ext4 "$LS"
-                echo "Mounting on /workspaces/diskmnt"
-                mount -o defaults,rw "$LS" /workspaces/diskmnt
-                echo "Printing disk info to output_disks.txt"
-                tune2fs -l "$LS" > output_disks.txt
-                echo "Done"
-                echo "Disks created + mounted"
-                ;;
-            "40")
-                echo "Wait..."
-                mkdir -p /workspaces/diskmnt
-                dd if=/dev/zero of=/tmp/disk_loop bs=1024 count=42949672960 status=progress
-                echo "Done creating, now formatting and mounting"
-                echo "Setting up disks"
-                LS="$(losetup -f)"
-                losetup "$LS" /tmp/disk_loop
-                mkfs.ext4 "$LS"
-                echo "Mounting on /workspaces/diskmnt"
-                mount -o defaults,rw "$LS" /workspaces/diskmnt
-                echo "Printing disk info to output_disks.txt"
-                tune2fs -l "$LS" > output_disks.txt
-                echo "Done"
-                echo "Disks created + mounted"
-                ;;  
-            "0")
-                echo "Aborted creating disks"
-                ;;
-            *)
-                echo "$STOR is invalid"
-                echo "Only allowed: 0 / 24 / 40"
-                exit 1
-                ;;
-        esac
-    fi
-}
+# function setup_storage_space() {
+#     # You want expanded storage?? Ill give you expanded storage...
+#     # Idk if microsoft would patch this even i guess
+#     if [ -e /tmp/disk_loop ] && [ -e /workspaces/diskmnt ]; then
+#         echo "No need to setup storage space... its already available"
+#         echo "df -h /workspaces/diskmnt"
+#         df -h /workspaces/diskmnt
+#         echo "df -h /tmp/disk_loop"
+#         df -h /tmp/disk_loop
+#     else
+#         echo "Size Available: None[0], 24GB [24] and 40GB [40]"
+#         read -p "Choose what additional storage size you wanted, you can ignore this if you want... (Warning: The space/disk will be reset after codespace ends itselfm, suggest you should now wha you are doing): " STOR
+#         case $STOR in
+#             "24")
+#                 echo "Wait..."
+#                 mkdir -p /workspaces/diskmnt
+#                 # dd if=/dev/zero of=/tmp/disk_loop bs=1024 count=244140625 status=progress
+#                 fallocate -l 24G /tmp/disk_loop
+#                 echo "Done creating, now formatting and mounting"
+#                 echo "Setting up disks"
+#                 LS="$(losetup -f)" # losetup is broken
+#                 losetup "$LS" /tmp/disk_loop
+#                 mkfs.ext4 "/tmp/disk_loop"
+#                 echo "Mounting on /workspaces/diskmnt"
+#                 sudo mount "/tmp/disk_loop" /workspaces/diskmnt
+#                 echo "Printing disk info to output_disks.txt"
+#                 tune2fs -l "/workspaces/diskmnt" > output_disks.txt
+#                 echo "Done"
+#                 echo "Disks created + mounted"
+#                 ;;
+#             "40")
+#                 echo "Wait..."
+#                 mkdir -p /workspaces/diskmnt
+#                 # dd if=/dev/zero of=/tmp/disk_loop bs=1024 count=40960000000 status=progress
+#                 fallocate -l 40G /tmp/disk_loop
+#                 echo "Done creating, now formatting and mounting"
+#                 echo "Setting up disks"
+#                 LS="$(losetup -f)"
+#                 losetup "$LS" /tmp/disk_loop
+#                 mkfs.ext4 "/tmp/disk_loop"
+#                 echo "Mounting on /workspaces/diskmnt"
+#                 sudo mount "/tmp/disk_loop" /workspaces/diskmnt
+#                 echo "Printing disk info to" output_disks.txt"
+#                 tune2fs -l "/workspaces/diskmnt > output_disks.txt
+#                 echo "Done"
+#                 echo "Disks created + mounted"
+#                 ;;  
+#             "0")
+#                 echo "Aborted creating disks"
+#                 ;;
+#             *)
+#                 echo "$STOR is invalid"
+#                 echo "Only allowed: 0 / 24 / 40"
+#                 exit 1
+#                 ;;
+#         esac
+#     fi
+# }
 
 setup_codebase_sys_swap
-setup_storage_space
+# setup_storage_space
