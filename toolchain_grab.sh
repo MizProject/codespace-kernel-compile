@@ -58,9 +58,9 @@ function kawa_a_yan() {
     TIMER=10
     while true; do
         echo "...$TIMER"
-        $TIMER=$((--NAR))
+        $TIMER=$((--TIMER))
         sleep 1
-        if [[ $NAR == '0' ]]; then
+        if [[ $TIMER == '0' ]]; then
             echo "STARTING!"
             break
         fi
