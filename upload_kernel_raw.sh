@@ -30,5 +30,5 @@ case $RES in
     echo "Invalid Response"
     echo "Use: Y or y or N or n"
     exit 1
-  ` ;;
+    ;;
 esac
