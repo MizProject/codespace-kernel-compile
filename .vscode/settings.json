@@ -1,3 +1,10 @@
 {
-    "git.ignoreLimitWarning": true
+    "git.ignoreLimitWarning": true,
+    "[markdown]": {
+        "editor.quickSuggestions": {
+          "other": true,
+          "comments": true,
+          "strings": true,
+        }
+    }
 }
