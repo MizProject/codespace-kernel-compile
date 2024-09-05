@@ -14,9 +14,13 @@ function transfer_souls() {
     read -p "Do you want to transfer these toolchains directly to your kernel source? (y/n): " ans
     case $ans in
         [Yy]*)
+            clear
+            echo "Directory: "
+            echo ""
             ls -lha
-            read -p "Directory: $(pwd)/ :" loc
-            read -p "Are you sure its on $(pwd)/$loc (y/n):" answ
+            echo ""
+            read -p "Directory: $(pwd)/:" loc
+            read -p "Are you sure its on $(pwd)/$loc (y/n): " answ
             case $answ in
                 [Yy]*)
                     mv $CLANG_NAME $(pwd)/$loc/
@@ -53,7 +57,7 @@ function kawa_a_yan() {
     echo "Clang: $CLANG"
     echo "LLVM: $LLVM"
     echo "Edit entries at $(pwd)/repository_target"
-    echo "Abort if necessary, Ctrl + C"
+    echo "Abort if necessary, do: Ctrl + C"
     echo "Starts in"
     TIMER=10
     while true; do

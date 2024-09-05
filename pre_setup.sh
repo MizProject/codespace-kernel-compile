@@ -26,7 +26,7 @@ case $ANS in
         ;;
     *)
         echo "$ANS is not a valid response"
-        exit 1
+        ./pre_setup.sh # lazy doing while true;do
         ;;
 esac
 
