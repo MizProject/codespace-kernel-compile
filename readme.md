@@ -24,4 +24,8 @@ The `upload_kernel_raw.sh` is a tool to upload your kernel to an SFTP server lik
 ---
 
 
+
+
 [![Support badge](https://img.shields.io/badge/-Donate_to_my_Ko--fi_Account-blue)](https://ko-fi.com/xynoxx)
+
+
