@@ -2,7 +2,7 @@
 
 # After Reverse Engineering @tiann's installer script on how it can easily connect stuff
 # This script is the result of hard work
-# Also KSU is already obsolete so what's the point of demand?
+# Also KSU is already obsolete so what's the point of demand for non-GKI?
 # Like GKI is the norm now and ACK Kernels are going to be obsolete on January 2025
 
 while true; do
