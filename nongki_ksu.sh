@@ -53,6 +53,7 @@ case "$1" in
         ;;
     "--download-move-and-link")
         SPECIAL_TRIGGER=1
+        ;;
     *)
         ./nongki_ksu.sh --help
         exit
@@ -62,13 +63,15 @@ esac
 
 
 
-ROOT="$(pwd)" # ENV 
-FULL_SRC="$ROOT/$SOURCE" # May be self-explanatory
+DIRROOT="$(pwd)" # ENV 
+# FULL_SRC="$DIRROOT/$SOURCE" # May be self-explanatory # Update : FUCKING SHIT THIS VARIABLE TURNS EVERYTHING TO FUCKING NULL WHAT IN FUCK SAKE
 SOURCE="" # Kernel Source
-SYMLINKTO="$FULL_SRC/drivers/kernelsu" # For symlink
-DRIVERS="$FULL_SRC/drivers" # also explanatory
-PATCHRUN="$FULL_SRC/KernelSU/hook_patch/$HOOK_TARGET"
-KSU_MOVED="$FULL_SRC/KernelSU"
+# SYMLINKTO="$DIRROOT/$SOURCE/drivers/kernelsu" # For symlink
+# DRIVERS="$DIRROOT/$SOURCE/drivers" # also explanatory
+# PATCHRUN="$DIRROOT/$SOURCE/KernelSU/hook_patch/$HOOK_TARGET"
+# KSU_MOVED="$DIRROOT/$SOURCE/KernelSU"
+
+echo "ROOT: $DIRROOT"
 
 function clone_service() {
     # Cloning KSU Fork
@@ -78,32 +81,36 @@ function clone_service() {
 
 function mvfile () {
     # MOVE KSU TO KERNEL SOURCE
-    mv KernelSU $SOURCE/
+    mv $DIRROOT/KernelSU $SOURCE/
 }
 
 function linkit() {
     # Link KSU
-    cd $DRIVERS
-    ln -sf "$SYMLINKTO" "$KSU_MOVED/kernel"
+    cd $SOURCE/drivers
+    ln -sf "$DIRROOT/$SOURCE/KernelSU/kernel" "$DIRROOT/$SOURCE/drivers/kernelsu" 
 }
 
 function patch() {
-    cd $FULL_SRC # Force redir to repo
-    git apply --stat --check "$KSU_MOVED/$HOOK_TARGET"
-    git apply --stat --check "$KSU_MOVED/Kcm-4.19-a12s.diff"
+    cd .. # Force redir to repo
+    
+    git apply --stat --check "KernelSU/hook_patch/$HOOK_TARGET"
+    echo "DFS"
+    git apply --stat --check "KernelSU/hook_patch/Kcm-4.19-a12s.diff"
 }
 function revert_dir_location() {
-    cd $ROOT
+    cd $DIRROOT
 }
 
 case $SPECIAL_TRIGGER in
     0)
         while true; do
             read -p "Do you want to try KSU and apply patches? [Y/n]: " ans
+            read -p "Where is the folder?: " SOURCE
             case $ans in
                 [Y/y]*)
                     echo "OK!"
                     break
+                    ;;
                 [N/n]*)
                     exit 1
                     exit 1 # if in doubt, double it, like gambling
@@ -115,18 +122,25 @@ case $SPECIAL_TRIGGER in
                     ;;
             esac
         done
+        
+        sleep 3
         echo "[-] Grabbing KSU"
         clone_service
+        
         echo "[Y] DONE"
         echo "[-] Moving"
+        
         mvfile
         echo "[Y] DONE"
         echo "[-] Linking"
+        
         linkit
         echo "[Y] Done"
         echo "[-] Patching"
+        
         patch
         echo "[Y] Done"
+        
         revert_dir_location
         exit
         ;;
@@ -137,6 +151,7 @@ case $SPECIAL_TRIGGER in
                 [Y/y]*)
                     echo "OK!"
                     break
+                    ;;
                 [N/n]*)
                     exit 1
                     exit 1 # if in doubt, double it, like gambling
@@ -160,6 +175,7 @@ case $SPECIAL_TRIGGER in
         revert_dir_location
         exit
         ;;
+esac
 
 
 
