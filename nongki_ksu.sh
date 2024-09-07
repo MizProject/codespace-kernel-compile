@@ -1,77 +1,79 @@
 #!/bin/bash
 
-# After Reverse Engineering @tiann's installer script on how it can easily connect stuff
-# This script is the result of hard work
-# Also KSU is already obsolete so what's the point of demand for non-GKI?
-# Like GKI is the norm now and ACK Kernels are going to be obsolete on January 2025
+# Using Rissu Fork of KSU instead because tiann removed the Non-GKI support
 
-while true; do
-    echo "Grabbing KernelSU v-0.9.5"
-    aria2c https://archive.org/download/kernel-su-0.9.5/KernelSU-0.9.5.zip
-    if [ ! -e "KernelSU-0.9.5.zip" ]; then
-        echo "File missing!"
-        echo "Redownloading"
-        rm -rfv KernelSU*
-    else
-        echo "Found KSU"
-        break
-    fi
-done
+case "$1" in
+    "--kernel:4.19")
+        HOOK_TARGET="4.19_hook_patch.diff"
+        ;;
+    "--kernel:4.14")
+        HOOK_TARGET="4.14_hook_patch.diff"
+        ;;
+    "--kernel:4.9")
+        HOOK_TARGET="4.9_hook_patch.diff"
+        ;;
+    "--kernel:4.4")
+        HOOK_TARGET="4.4_hook_patch.diff"
+        ;;
+    [--help/-h]*)
+        echo ""
+        echo "KSU NON-GKI Setup src"
+        echo "Brought to you by rissu (on ksu fork) and SUFandom(on this script)"
+        echo "v1"
+        echo ""
+        echo "Usage:"
+        echo "./nongki_ksu.sh --<args>"
+        echo ""
+        echo "Arguments"
+        echo "  --help -h               Shows this help page"
+        echo "  --kernel:<version>      Uses the patch method readily available"
+        echo ""
+        echo "Patch:"
+        echo "  Usage:"
+        echo "  ./nongki_ksu.sh --kernel:4.4"
+        echo ""
+        echo "  Version:"
+        echo "      4.4 Kernel      --kernel:4.4"
+        echo "      4.9 Kernel      --kernel:4.9"
+        echo "      4.14 Kernel     --kernel:4.14"
+        echo "      4.19 Kernel     --kernel:4.19"
+        echo ""
+        echo "For GKI Kernels, do check with tiann's installer script instead"
+        echo "Earlier than 4.4 isn't supported"
+        echo ""
+        exit
+        ;;
+    *)
+        ./nongki_ksu.sh --help
+        exit
+        ;;
+esac
+        
 
 
-clear 
-unzip KernelSU-0.9.5.zip
 
-while true; do
-    clear
-    echo "Directory : $(pwd)"
-    echo ""
-    ls -lha
-    echo ""
-    read -p "Can you pinpoint where is the kernel source? [Y/n]: " SK
-    case $SK in 
-        [Yy]*)
-            while true; do
-                clear
-                echo "Directory : $(pwd)"
-                echo ""
-                ls -lha
-                echo ""
-                read -p "Where is it? [$(pwd)/]: " LOC
-                echo "DEBUG: LOC VAR SAYS: $LOC, ASSUMING SRC IS IN: $(pwd)/$LOC"
-                echo ""
-                echo "Ignore this ^ unless if theres an issue"
-                DRIVER_MAKEFILE=$(pwd)/$LOC/drivers/Makefile
-                DRIVER_KCONFIG=$(pwd)/$LOC/drivers/Kconfig
-                if [ -e $LOC ] && [ -e $LOC/drivers ]; then 
-                    echo "Source: $LOC OK"
-                    echo "Driver: $LOC/drivers OK"
-                    echo "Moving KSU Files to $(pwd)/$LOC"
-                    ROOTDIR="$(pwd)"
-                    echo "Starts"
-                    mv -v "KernelSU" "$LOC/"
-                    echo "Linking"
-                    cd $LOC/drivers
-                    ln -sf "$ROOTDIR/$LOC/KernelSU/kernel" "kernelsu" && echo "Linked!"
-                    grep -q "kernelsu" || "$DRIVER_MAKEFILE" || printf "\nobj-\$(CONFIG_KSU) += kernelsu/\n" >> "$DRIVER_MAKEFILE" # Makefile Edited
-                    grep -q "source \"drivers/kernelsu/Kconfig\"" "$DRIVER_KCONFIG" || sed -i "/endmenu/i\source \"drivers/kernelsu/Kconfig\"" "$DRIVER_KCONFIG" #KConfig EDited
-                    echo "KConfig and Makefile edited"
-                    cd $ROOTDIR
-                    break
-                else
-                    echo "Error, can't find $(pwd)/$LOC"
-                fi
-            done
-            ;;
-        [Nn]*)
-            echo "Abort"
-            exit 9
-            break
-            ;;
-        *)
-            echo "Argument : $SK is not allowed, only Y or y or N or n only"
-            ;;
-    esac
-exit
-done
-exit 
+ROOT="$(pwd)" # ENV 
+FULL_SRC="$ROOT/$SOURCE" # May be self-explanatory
+SOURCE="" # Kernel Source
+SYMLINKTO="$FULL_SRC/drivers/kernelsu" # For symlink
+DRIVERS="$FULL_SRC/drivers" # also explanatory
+PATCHRUN="$FULL_SRC/KernelSU/hook_patch/$HOOK_TARGET"
+KSU_MOVED="$FULL_SRC/KernelSU"
+
+function clone_service() {
+    # Cloning KSU Fork
+    git clone https://github.com/rsuntk/KernelSU
+}
+
+function mvfile () {
+    # MOVE KSU TO KERNEL SOURCE
+    mv KernelSU $SOURCE/
+}
+
+function linkit() {
+    # Link KSU
+    cd $DRIVERS
+    ln -sf "$SYMLINKTO" "$KSU_MOVED/kernel"
+}
+
+
