@@ -96,8 +96,8 @@ echo "ROOT: $DIRROOT"
 
 function clone_service() {
     # Cloning KSU Fork
-    # git clone https://github.com/rsuntk/KernelSU
-    git clone https://github.com/SUFandom/KernelSU
+    git clone https://github.com/rsuntk/KernelSU
+    # git clone https://github.com/Mizumo-prjkt/KernelSU
 }
 
 function mvfile () {
