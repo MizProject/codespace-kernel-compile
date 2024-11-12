@@ -69,8 +69,8 @@ function kawa_a_yan() {
             break
         fi
     done
-    git clone $CLANG
-    git clone $LLVM
+    git clone $CLANG $CLANG_NAME
+    git clone $LLVM $LLVM_NAME
     check
 }
 
